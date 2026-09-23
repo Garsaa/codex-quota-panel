@@ -1,0 +1,58 @@
+{
+  "name": "codex-quota-panel",
+  "publisher": "garsa",
+  "version": "0.2.0",
+  "displayName": "Codex Limits",
+  "description": "Mostra limites e horários de reset do Codex ao lado do chat.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Garsaa/codex-quota-panel.git"
+  },
+  "engines": {
+    "vscode": "^1.96.2"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionDependencies": [
+    "openai.chatgpt"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "codexQuota.refresh",
+        "title": "Atualizar limites",
+        "category": "Codex",
+        "icon": "$(refresh)"
+      }
+    ],
+    "views": {
+      "codexViewContainer": [
+        {
+          "id": "codexQuotaSidebarView",
+          "name": "Limites",
+          "icon": "resources/quota.svg",
+          "when": "chatgpt.doesNotSupportSecondarySidebar"
+        }
+      ],
+      "codexSecondaryViewContainer": [
+        {
+          "id": "codexQuotaSecondaryView",
+          "name": "Limites",
+          "icon": "resources/quota.svg",
+          "when": "!chatgpt.doesNotSupportSecondarySidebar"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "codexQuota.refresh",
+          "when": "view == codexQuotaSidebarView || view == codexQuotaSecondaryView",
+          "group": "navigation"
+        }
+      ]
+    }
+  }
+}
