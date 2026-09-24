@@ -6,11 +6,11 @@
   "description": "Acompanhe seus limites e horários de reset do Codex no VS Code.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Garsaa/extensao-dos-cria.git"
+    "url": "https://github.com/Garsaa/extensoes-dos-cria.git"
   },
-  "homepage": "https://github.com/Garsaa/extensao-dos-cria/tree/main/codex-quota",
+  "homepage": "https://github.com/Garsaa/extensoes-dos-cria/tree/main/codex-quota",
   "bugs": {
-    "url": "https://github.com/Garsaa/extensao-dos-cria/issues"
+    "url": "https://github.com/Garsaa/extensoes-dos-cria/issues"
   },
   "keywords": [
     "codex",
