@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const vscode = require('vscode');
+const { panelHtml } = require('./panel');
 
 const POLL_INTERVAL_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -52,7 +53,7 @@ class CodexAppServer {
       this.child.on('close', () => this.onClosed(new Error('Conexão com o Codex encerrada.')));
 
       await this.request('initialize', {
-        clientInfo: { name: 'codex-quota-panel', title: 'Codex Limits', version: '0.2.0' },
+        clientInfo: { name: 'codex-quota-panel', title: 'Codex Quota', version: '0.3.2' },
         capabilities: null,
       });
       this.child.stdin.write(JSON.stringify({ method: 'initialized', params: {} }) + '\n');
@@ -167,82 +168,46 @@ function normalize(result) {
   };
 }
 
-class QuotaTreeProvider {
-  constructor() {
+class QuotaViewProvider {
+  constructor(onAction) {
+    this.onAction = onAction;
+    this.views = new Set();
     this.snapshot = null;
     this.error = null;
-    this.changed = new vscode.EventEmitter();
-    this.onDidChangeTreeData = this.changed.event;
+  }
+
+  resolveWebviewView(view) {
+    view.webview.options = { enableScripts: true };
+    view.webview.html = panelHtml();
+    this.views.add(view);
+    view.onDidDispose(() => this.views.delete(view));
+    view.webview.onDidReceiveMessage((message) => {
+      if (message.type === 'ready') this.send(view);
+      else if (message.type === 'refresh' || message.type === 'usage') this.onAction(message.type);
+    });
   }
 
   update(snapshot, error = null) {
     this.snapshot = snapshot;
     this.error = error;
-    this.changed.fire();
+    for (const view of this.views) this.send(view);
   }
 
-  getTreeItem(item) { return item; }
-
-  getChildren(parent) {
-    if (parent?.resetWindow) {
-      const reset = new vscode.TreeItem(`Reinicia: ${formatReset(parent.resetWindow.resetsAt)}`);
-      reset.description = timeUntilReset(parent.resetWindow.resetsAt);
-      reset.tooltip = `${parent.label} reinicia em ${formatReset(parent.resetWindow.resetsAt)} (${timeUntilReset(parent.resetWindow.resetsAt)}).`;
-      reset.iconPath = new vscode.ThemeIcon('history');
-      return [reset];
-    }
-
-    if (!this.snapshot) {
-      const item = new vscode.TreeItem(this.error || 'Carregando limites…');
-      item.iconPath = new vscode.ThemeIcon(this.error ? 'warning' : 'sync');
-      return [item];
-    }
-
-    const quotaItem = (label, window, icon) => {
-      const hasReset = window?.resetsAt !== null
-        && window?.resetsAt !== undefined
-        && Number.isFinite(Number(window.resetsAt));
-      const item = new vscode.TreeItem(label, hasReset
-        ? vscode.TreeItemCollapsibleState.Expanded
-        : vscode.TreeItemCollapsibleState.None);
-      const percent = remaining(window);
-      item.description = percent === null ? 'indisponível' : `${percent}% restante`;
-      item.tooltip = percent === null
-        ? `${label}: o Codex não retornou esta janela.`
-        : `${label}: ${percent}% restante. Reinicia em ${formatReset(window.resetsAt)}.`;
-      item.iconPath = new vscode.ThemeIcon(icon);
-      if (hasReset) item.resetWindow = window;
-      return item;
-    };
-
-    const resetItem = new vscode.TreeItem('Resets guardados');
-    resetItem.description = this.snapshot.resets === null
-      ? 'indisponível'
-      : `${this.snapshot.resets} disponível(is)${this.snapshot.resets > 0 ? ' · abrir Usage & Billing' : ''}`;
-    resetItem.iconPath = new vscode.ThemeIcon('refresh');
-    resetItem.tooltip = this.snapshot.resets > 0
-      ? 'Abrir Codex Settings → Usage & Billing no navegador.'
-      : 'Saldo de resets de limite acumulados na conta.';
-    if (this.snapshot.resets > 0) {
-      resetItem.command = {
-        command: 'codexQuota.openUsage',
-        title: 'Abrir Usage & Billing',
-      };
-    }
-
-    const items = [
-      quotaItem('5 horas', this.snapshot.fiveHours, 'clock'),
-      quotaItem('Semana', this.snapshot.week, 'calendar'),
-      resetItem,
-    ];
-    if (this.error) {
-      const stale = new vscode.TreeItem('Falha ao atualizar');
-      stale.description = 'mostrando último valor';
-      stale.tooltip = this.error;
-      stale.iconPath = new vscode.ThemeIcon('warning');
-      items.push(stale);
-    }
-    return items;
+  send(view) {
+    const data = this.snapshot;
+    const windowData = (window) => ({
+      remaining: remaining(window),
+      reset: window?.resetsAt == null ? null
+        : `Reinicia ${timeUntilReset(window.resetsAt)} · ${formatReset(window.resetsAt)}`,
+    });
+    void view.webview.postMessage({
+      type: 'snapshot',
+      five: windowData(data?.fiveHours),
+      week: windowData(data?.week),
+      resets: data?.resets ?? null,
+      updated: data?.updatedAt?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) ?? null,
+      error: this.error,
+    });
   }
 }
 
@@ -255,7 +220,7 @@ function updateStatusBar(statusBar, snapshot, error) {
 
   const five = remaining(snapshot.fiveHours);
   const week = remaining(snapshot.week);
-  statusBar.text = `$(dashboard) Codex 5h ${five ?? '—'}% · sem ${week ?? '—'}%`;
+  statusBar.text = `$(dashboard) 5h ${five ?? '—'}% · 7d ${week ?? '—'}%`;
   statusBar.tooltip = [
     `5h: ${five ?? '—'}% restante; reinicia ${formatReset(snapshot.fiveHours?.resetsAt)}`,
     `Semana: ${week ?? '—'}% restante; reinicia ${formatReset(snapshot.week?.resetsAt)}`,
@@ -267,7 +232,10 @@ function updateStatusBar(statusBar, snapshot, error) {
 }
 
 function activate(context) {
-  const provider = new QuotaTreeProvider();
+  const provider = new QuotaViewProvider((action) => {
+    if (action === 'refresh') refresh();
+    if (action === 'usage') vscode.env.openExternal(vscode.Uri.parse(USAGE_URL));
+  });
   const server = new CodexAppServer();
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBar.command = 'codexQuota.refresh';
@@ -275,8 +243,8 @@ function activate(context) {
 
   context.subscriptions.push(
     statusBar,
-    vscode.window.registerTreeDataProvider('codexQuotaSidebarView', provider),
-    vscode.window.registerTreeDataProvider('codexQuotaSecondaryView', provider),
+    vscode.window.registerWebviewViewProvider('codexQuotaSidebarView', provider),
+    vscode.window.registerWebviewViewProvider('codexQuotaSecondaryView', provider),
     { dispose: () => server.dispose() },
   );
 

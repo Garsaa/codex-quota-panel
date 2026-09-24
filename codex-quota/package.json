@@ -1,13 +1,24 @@
 {
   "name": "codex-quota-panel",
   "publisher": "garsa",
-  "version": "0.2.0",
-  "displayName": "Codex Limits",
-  "description": "Mostra limites e horários de reset do Codex ao lado do chat.",
+  "version": "0.3.2",
+  "displayName": "Codex Quota",
+  "description": "Acompanhe seus limites e horários de reset do Codex no VS Code.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Garsaa/codex-quota-panel.git"
+    "url": "https://github.com/Garsaa/extensao-dos-cria.git"
   },
+  "homepage": "https://github.com/Garsaa/extensao-dos-cria/tree/main/codex-quota",
+  "bugs": {
+    "url": "https://github.com/Garsaa/extensao-dos-cria/issues"
+  },
+  "keywords": [
+    "codex",
+    "quota",
+    "limits",
+    "openai",
+    "usage"
+  ],
   "engines": {
     "vscode": "^1.96.2"
   },
@@ -32,6 +43,7 @@
         {
           "id": "codexQuotaSidebarView",
           "name": "Limites",
+          "type": "webview",
           "icon": "resources/quota.svg",
           "when": "chatgpt.doesNotSupportSecondarySidebar"
         }
@@ -40,6 +52,7 @@
         {
           "id": "codexQuotaSecondaryView",
           "name": "Limites",
+          "type": "webview",
           "icon": "resources/quota.svg",
           "when": "!chatgpt.doesNotSupportSecondarySidebar"
         }

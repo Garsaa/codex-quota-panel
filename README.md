@@ -1,26 +1,64 @@
-# Codex Limits
+# 🧩 Extensões dos Cria
 
-Extensão complementar para VS Code que mostra o limite restante do Codex nas janelas de 5 horas e semanal, os horários de reset e a quantidade de resets guardados.
+**Extensões pequenas, úteis e feitas pra deixar o VS Code mais do seu jeito.**
 
-O painel **Limites** aparece na mesma barra lateral do Codex. O item da barra de status mostra os percentuais. A consulta é feita a cada minuto; o botão de atualizar força uma nova leitura. Se houver resets guardados, clicar nesse item abre [Codex Settings → Usage & Billing](https://chatgpt.com/codex/settings/usage).
+Este repositório reúne projetos independentes: **uma extensão por pasta**, cada uma com seu próprio código, manifesto, documentação e versão.
 
-## Instalar em outro computador
+## ✨ Catálogo
 
-1. Instale a extensão oficial **Codex** (`openai.chatgpt`) e faça login nela.
-2. Baixe este repositório privado ou apenas o arquivo `dist/codex-quota-panel-0.2.0.vsix`.
-3. Execute `code --install-extension dist/codex-quota-panel-0.2.0.vsix --force` na pasta do repositório. No VS Code, também é possível usar **Extensions → … → Install from VSIX**.
-4. Recarregue a janela do VS Code e abra o painel **Limites** ao lado do chat do Codex.
+| Extensão | Pasta | O que faz |
+| --- | --- | --- |
+| **Codex Quota** | [codex-quota/](codex-quota/) | Mostra o uso restante e os horários de reset do Codex dentro do VS Code. |
 
-## Funcionamento
+## 🚀 Instalar o Codex Quota
 
-A extensão inicia o executável local incluído na extensão oficial do Codex e consulta `account/rateLimits/read` no app server. Não armazena credenciais nem envia os limites a terceiros. O link de Usage & Billing abre o site do Codex somente quando clicado.
+1. Instale a extensão oficial **Codex** (openai.chatgpt) e entre na sua conta.
+2. Baixe [codex-quota-panel-0.3.2.vsix](codex-quota/dist/codex-quota-panel-0.3.2.vsix).
+3. No terminal, na raiz deste repositório, execute:
 
-Essa interface do app server pode mudar em versões futuras do Codex. A versão atual foi verificada em Linux x64; os caminhos do executável para Windows e macOS ainda precisam de validação nesses sistemas.
+   ~~~sh
+   code --install-extension codex-quota/dist/codex-quota-panel-0.3.2.vsix --force
+   ~~~
 
-## Gerar o VSIX
+   Ou no VS Code: **Extensions** → **…** → **Install from VSIX…**.
+4. Recarregue a janela e abra o painel **Limites** junto ao Codex.
 
-Com Node.js e npm instalados:
+## 💡 O que ela mostra
 
-```sh
-npm exec --yes --package @vscode/vsce -- vsce package --no-dependencies --out dist/codex-quota-panel-0.2.0.vsix
-```
+- Limite restante nas janelas de **5 horas** e **1 semana**.
+- Percentuais, barras de progresso e horários de reset.
+- Resets guardados e horário da última leitura.
+- Atualização automática a cada minuto e botão para atualizar na hora.
+- Resumo dos limites na barra de status.
+
+## 🛠️ Empacotar para desenvolvimento
+
+Com Node.js e npm instalados, entre na pasta da extensão e gere um novo VSIX:
+
+~~~sh
+cd codex-quota
+npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o dist/codex-quota-panel-0.3.2.vsix"
+~~~
+
+Antes de publicar uma nova versão, atualize o campo version em codex-quota/package.json e ajuste o nome do arquivo VSIX nos comandos acima.
+
+## 🔄 Sobre atualizações
+
+Cada extensão tem sua própria versão e é empacotada separadamente. **Instalar um VSIX deste repositório não configura atualização automática**: para receber mudanças, instale o VSIX mais novo. Atualizações automáticas pelo VS Code dependem da publicação da extensão no Visual Studio Marketplace e de o auto-update estar ativado.
+
+## 📁 Estrutura
+
+~~~text
+.
+├── codex-quota/
+│   ├── extension.js
+│   ├── panel.js
+│   ├── package.json
+│   ├── README.md
+│   └── resources/
+└── README.md
+~~~
+
+---
+
+Feito com ☕ e código.
