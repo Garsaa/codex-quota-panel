@@ -1,6 +1,6 @@
 # 🧩 Extensões dos Cria
 
-**Extensões pequenas, úteis e feitas pra deixar o VS Code mais do seu jeito.**
+**Extensões pequenas, úteis e feitas pra deixar o VS Code dos cria.**
 
 Este repositório reúne projetos independentes: **uma extensão por pasta**, cada uma com seu próprio código, manifesto, documentação e versão.
 
