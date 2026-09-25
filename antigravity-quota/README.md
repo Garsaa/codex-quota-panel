@@ -21,10 +21,10 @@ O painel **Limites** fica na barra lateral do Antigravity (junto ao Chat) e most
 
 ## Instalar pelo VSIX
 
-Baixe o arquivo [antigravity-quota-panel-0.1.0.vsix](dist/antigravity-quota-panel-0.1.0.vsix) ou, na raiz do repositório, execute:
+Baixe o arquivo [antigravity-quota-panel-0.1.1.vsix](dist/antigravity-quota-panel-0.1.1.vsix) ou, na raiz do repositório, execute:
 
 ~~~sh
-code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.0.vsix --force
+code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.1.vsix --force
 ~~~
 
 No VS Code, também é possível usar **Extensions** → **…** → **Install from VSIX…**. Depois, recarregue a janela e abra a barra lateral do Antigravity.

@@ -1,7 +1,7 @@
 {
   "name": "antigravity-quota-panel",
   "publisher": "garsa",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Antigravity Quota",
   "description": "Acompanhe seus limites e horários de reset do Antigravity no VS Code.",
   "repository": {
@@ -36,12 +36,34 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "antigravityQuota.openPanel",
+        "title": "Abrir painel de limites",
+        "category": "Antigravity",
+        "icon": "$(dashboard)"
+      },
+      {
         "command": "antigravityQuota.openUpgrade",
         "title": "Ver detalhes de créditos",
         "category": "Antigravity"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "antigravityQuotaContainer",
+          "title": "Antigravity Quota",
+          "icon": "resources/quota.svg"
+        }
+      ]
+    },
     "views": {
+      "antigravityQuotaContainer": [
+        {
+          "id": "antigravityQuotaView",
+          "name": "Limites",
+          "type": "webview"
+        }
+      ],
       "antigravity": [
         {
           "id": "antigravityQuotaSidebarView",
@@ -55,8 +77,7 @@
           "id": "antigravityQuotaExplorerView",
           "name": "Limites do Antigravity",
           "type": "webview",
-          "icon": "resources/quota.svg",
-          "when": "antigravityQuota.showInExplorer"
+          "icon": "resources/quota.svg"
         }
       ]
     },
@@ -64,7 +85,7 @@
       "view/title": [
         {
           "command": "antigravityQuota.refresh",
-          "when": "view == antigravityQuotaSidebarView || view == antigravityQuotaExplorerView",
+          "when": "view == antigravityQuotaView || view == antigravityQuotaSidebarView || view == antigravityQuotaExplorerView",
           "group": "navigation"
         }
       ]
@@ -76,11 +97,6 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Caminho customizado para o executável do Antigravity CLI (`agy`). Deixe em branco para detecção automática pelo `PATH` ou pasta padrão."
-        },
-        "antigravityQuota.showInExplorer": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Exibir o painel de limites também na barra lateral do Explorador de Arquivos."
         }
       }
     }

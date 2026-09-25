@@ -212,8 +212,15 @@ function activate(context) {
 
   context.subscriptions.push(
     statusBar,
+    vscode.window.registerWebviewViewProvider('antigravityQuotaView', provider),
     vscode.window.registerWebviewViewProvider('antigravityQuotaSidebarView', provider),
     vscode.window.registerWebviewViewProvider('antigravityQuotaExplorerView', provider),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('antigravityQuota.openPanel', () => {
+      vscode.commands.executeCommand('antigravityQuotaView.focus');
+    }),
   );
 
   let snapshot = null;

@@ -30,11 +30,11 @@ Este repositório reúne projetos independentes: **uma extensão por pasta**, ca
 
 1. Certifique-se de ter o CLI **Antigravity** (`agy`) instalado e autenticado com sua conta Google (`agy login`).
 2. *(Recomendado)* Tenha a extensão **Antigravity for VS Code** (`lyadhgod.antigravity-vscode`) instalada para que o painel apareça na barra lateral do Antigravity.
-3. Baixe [antigravity-quota-panel-0.1.0.vsix](antigravity-quota/dist/antigravity-quota-panel-0.1.0.vsix).
+3. Baixe [antigravity-quota-panel-0.1.1.vsix](antigravity-quota/dist/antigravity-quota-panel-0.1.1.vsix).
 4. No terminal, na raiz deste repositório, execute:
 
    ~~~sh
-   code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.0.vsix --force
+   code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.1.vsix --force
    ~~~
 
    Ou no VS Code: **Extensions** → **…** → **Install from VSIX…**.
@@ -59,7 +59,7 @@ npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o 
 
 # Antigravity Quota
 cd ../antigravity-quota
-npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o dist/antigravity-quota-panel-0.1.0.vsix"
+npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o dist/antigravity-quota-panel-0.1.1.vsix"
 ~~~
 
 ## 🔄 Sobre atualizações
