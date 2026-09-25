@@ -1,0 +1,88 @@
+{
+  "name": "antigravity-quota-panel",
+  "publisher": "garsa",
+  "version": "0.1.0",
+  "displayName": "Antigravity Quota",
+  "description": "Acompanhe seus limites e horários de reset do Antigravity no VS Code.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Garsaa/extensoes-dos-cria.git"
+  },
+  "homepage": "https://github.com/Garsaa/extensoes-dos-cria/tree/main/antigravity-quota",
+  "bugs": {
+    "url": "https://github.com/Garsaa/extensoes-dos-cria/issues"
+  },
+  "keywords": [
+    "antigravity",
+    "quota",
+    "limits",
+    "google",
+    "gemini",
+    "usage"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "antigravityQuota.refresh",
+        "title": "Atualizar limites",
+        "category": "Antigravity",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "antigravityQuota.openUpgrade",
+        "title": "Ver detalhes de créditos",
+        "category": "Antigravity"
+      }
+    ],
+    "views": {
+      "antigravity": [
+        {
+          "id": "antigravityQuotaSidebarView",
+          "name": "Limites",
+          "type": "webview",
+          "icon": "resources/quota.svg"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "antigravityQuotaExplorerView",
+          "name": "Limites do Antigravity",
+          "type": "webview",
+          "icon": "resources/quota.svg",
+          "when": "antigravityQuota.showInExplorer"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "antigravityQuota.refresh",
+          "when": "view == antigravityQuotaSidebarView || view == antigravityQuotaExplorerView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Antigravity Quota",
+      "properties": {
+        "antigravityQuota.cliPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Caminho customizado para o executável do Antigravity CLI (`agy`). Deixe em branco para detecção automática pelo `PATH` ou pasta padrão."
+        },
+        "antigravityQuota.showInExplorer": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Exibir o painel de limites também na barra lateral do Explorador de Arquivos."
+        }
+      }
+    }
+  }
+}
