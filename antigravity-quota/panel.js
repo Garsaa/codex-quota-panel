@@ -17,11 +17,7 @@ function panelHtml() {
     button { font: inherit; cursor: pointer; }
     .refresh { border: 0; padding: 2px 6px; background: transparent; color: var(--vscode-textLink-foreground); border-radius: 4px; }
     .refresh:hover { background: var(--vscode-toolbar-hoverBackground); }
-    .refresh:focus-visible, .credits a:focus-visible, .tab:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
-    .tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-    .tab { border: 1px solid var(--vscode-panel-border, rgba(128,128,128,0.28)); background: transparent; color: var(--vscode-descriptionForeground); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 12px; transition: all .15s ease; white-space: nowrap; }
-    .tab:hover { color: var(--vscode-foreground); background: var(--vscode-toolbar-hoverBackground); }
-    .tab.active { background: #a855f7; color: #ffffff; border-color: #a855f7; font-weight: 600; }
+    .refresh:focus-visible, .credits a:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
     .quota + .quota { margin-top: 14px; }
     .line { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
     .label { font-weight: 600; }
@@ -41,7 +37,6 @@ function panelHtml() {
 </head>
 <body>
   <div class="top"><h1 class="heading">Limites do Antigravity</h1><button class="refresh" id="refresh" type="button" title="Atualizar limites">Atualizar</button></div>
-  <div class="tabs" id="tabs" hidden></div>
   <main aria-live="polite">
     <section class="quota" aria-label="Limite de 5 horas">
       <div class="line"><span class="label">5 horas</span><span class="value"><span id="five-value">—</span><span class="unit"> restante</span></span></div>
@@ -62,8 +57,6 @@ function panelHtml() {
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     const byId = (id) => document.getElementById(id);
-    let currentGroups = [];
-    let selectedGroupIndex = 0;
 
     byId('refresh').addEventListener('click', () => vscode.postMessage({ type: 'refresh' }));
     byId('credits').addEventListener('click', (event) => {
@@ -80,42 +73,10 @@ function panelHtml() {
       byId(prefix + '-reset').textContent = data?.reset || 'Horário de reset indisponível';
     }
 
-    function renderGroup(group) {
-      if (!group) return;
-      showWindow('five', group.five);
-      showWindow('week', group.week);
-    }
-
-    function renderTabs(groups) {
-      const tabsContainer = byId('tabs');
-      tabsContainer.replaceChildren();
-      if (!groups || groups.length <= 1) {
-        tabsContainer.hidden = true;
-        return;
-      }
-      tabsContainer.hidden = false;
-      groups.forEach((group, index) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'tab' + (index === selectedGroupIndex ? ' active' : '');
-        btn.textContent = group.label || group.name || 'Grupo ' + (index + 1);
-        btn.addEventListener('click', () => {
-          selectedGroupIndex = index;
-          Array.from(tabsContainer.children).forEach((el, i) => {
-            el.classList.toggle('active', i === index);
-          });
-          renderGroup(currentGroups[selectedGroupIndex]);
-        });
-        tabsContainer.appendChild(btn);
-      });
-    }
-
     window.addEventListener('message', ({ data }) => {
       if (data.type !== 'snapshot') return;
-      currentGroups = data.groups || [];
-      if (selectedGroupIndex >= currentGroups.length) selectedGroupIndex = 0;
-      renderTabs(currentGroups);
-      renderGroup(currentGroups[selectedGroupIndex]);
+      showWindow('five', data.five);
+      showWindow('week', data.week);
 
       const credits = byId('credits');
       credits.replaceChildren();

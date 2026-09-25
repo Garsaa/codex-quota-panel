@@ -1,7 +1,7 @@
 {
   "name": "antigravity-quota-panel",
   "publisher": "garsa",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "Antigravity Quota",
   "description": "Acompanhe seus limites e horários de reset do Antigravity no VS Code.",
   "repository": {
@@ -30,21 +30,27 @@
   "contributes": {
     "commands": [
       {
-        "command": "antigravityQuota.refresh",
-        "title": "Atualizar limites",
-        "category": "Antigravity",
-        "icon": "$(refresh)"
-      },
-      {
         "command": "antigravityQuota.openPanel",
         "title": "Abrir painel de limites",
-        "category": "Antigravity",
+        "category": "Antigravity Quota",
         "icon": "$(dashboard)"
+      },
+      {
+        "command": "antigravityQuota.openAsEditor",
+        "title": "Abrir limites em nova aba",
+        "category": "Antigravity Quota",
+        "icon": "$(layout)"
+      },
+      {
+        "command": "antigravityQuota.refresh",
+        "title": "Atualizar limites",
+        "category": "Antigravity Quota",
+        "icon": "$(refresh)"
       },
       {
         "command": "antigravityQuota.openUpgrade",
         "title": "Ver detalhes de créditos",
-        "category": "Antigravity"
+        "category": "Antigravity Quota"
       }
     ],
     "viewsContainers": {
@@ -60,16 +66,8 @@
       "antigravityQuotaContainer": [
         {
           "id": "antigravityQuotaView",
-          "name": "Limites",
+          "name": "Limites do Antigravity",
           "type": "webview"
-        }
-      ],
-      "antigravity": [
-        {
-          "id": "antigravityQuotaSidebarView",
-          "name": "Limites",
-          "type": "webview",
-          "icon": "resources/quota.svg"
         }
       ],
       "explorer": [
@@ -85,7 +83,7 @@
       "view/title": [
         {
           "command": "antigravityQuota.refresh",
-          "when": "view == antigravityQuotaView || view == antigravityQuotaSidebarView || view == antigravityQuotaExplorerView",
+          "when": "view == antigravityQuotaView || view == antigravityQuotaExplorerView",
           "group": "navigation"
         }
       ]

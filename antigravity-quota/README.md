@@ -6,8 +6,7 @@ O painel **Limites** fica na barra lateral do Antigravity (junto ao Chat) e most
 
 ## Recursos
 
-- Barras de progresso com a cor roxa característica para os limites de 5 horas e semanal.
-- Alternância rápida por abas entre grupos de modelos (**Gemini** e **Claude & GPT**).
+- Barras de progresso com a cor roxa característica para os limites de 5 horas e semanal do Gemini.
 - Horário e contagem regressiva para cada reset.
 - Saldo de créditos de IA, com link direto para upgrade/detalhes.
 - Atualização automática a cada minuto e atualização manual pelo botão **Atualizar**.
@@ -17,14 +16,13 @@ O painel **Limites** fica na barra lateral do Antigravity (junto ao Chat) e most
 
 - Visual Studio Code **1.90.0** ou mais recente.
 - CLI do Antigravity (`agy`) instalado e autenticado na sua conta Google.
-- *(Opcional)* Extensão **Antigravity for VS Code** (`lyadhgod.antigravity-vscode`) para exibir o painel na mesma barra lateral do chat.
 
 ## Instalar pelo VSIX
 
-Baixe o arquivo [antigravity-quota-panel-0.1.1.vsix](dist/antigravity-quota-panel-0.1.1.vsix) ou, na raiz do repositório, execute:
+Baixe o arquivo [antigravity-quota-panel-0.1.2.vsix](dist/antigravity-quota-panel-0.1.2.vsix) ou, na raiz do repositório, execute:
 
 ~~~sh
-code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.1.vsix --force
+code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.2.vsix --force
 ~~~
 
 No VS Code, também é possível usar **Extensions** → **…** → **Install from VSIX…**. Depois, recarregue a janela e abra a barra lateral do Antigravity.

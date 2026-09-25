@@ -9,7 +9,7 @@ Este repositório reúne projetos independentes: **uma extensão por pasta**, ca
 | Extensão | Pasta | O que faz |
 | --- | --- | --- |
 | **Codex Quota** | [codex-quota/](codex-quota/) | Mostra o uso restante e os horários de reset do Codex dentro do VS Code. |
-| **Antigravity Quota** | [antigravity-quota/](antigravity-quota/) | Mostra o uso restante e os horários de reset do Antigravity no VS Code com progresso roxo e suporte a abas de modelos. |
+| **Antigravity Quota** | [antigravity-quota/](antigravity-quota/) | Mostra o uso restante e os horários de reset do Antigravity (Gemini) no VS Code com barras de progresso roxas. |
 
 ## 🚀 Instalação
 
@@ -29,16 +29,15 @@ Este repositório reúne projetos independentes: **uma extensão por pasta**, ca
 ### Antigravity Quota
 
 1. Certifique-se de ter o CLI **Antigravity** (`agy`) instalado e autenticado com sua conta Google (`agy login`).
-2. *(Recomendado)* Tenha a extensão **Antigravity for VS Code** (`lyadhgod.antigravity-vscode`) instalada para que o painel apareça na barra lateral do Antigravity.
-3. Baixe [antigravity-quota-panel-0.1.1.vsix](antigravity-quota/dist/antigravity-quota-panel-0.1.1.vsix).
-4. No terminal, na raiz deste repositório, execute:
+2. Baixe [antigravity-quota-panel-0.1.2.vsix](antigravity-quota/dist/antigravity-quota-panel-0.1.2.vsix).
+3. No terminal, na raiz deste repositório, execute:
 
    ~~~sh
-   code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.1.vsix --force
+   code --install-extension antigravity-quota/dist/antigravity-quota-panel-0.1.2.vsix --force
    ~~~
 
    Ou no VS Code: **Extensions** → **…** → **Install from VSIX…**.
-5. Recarregue a janela e visualize o painel **Limites** com barras de progresso roxas.
+4. Recarregue a janela (`Developer: Reload Window`) e visualize o painel **Limites** com barras de progresso roxas na barra lateral ou no explorador.
 
 ## 💡 O que elas mostram
 
@@ -59,7 +58,7 @@ npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o 
 
 # Antigravity Quota
 cd ../antigravity-quota
-npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o dist/antigravity-quota-panel-0.1.1.vsix"
+npm exec --yes --package=@vscode/vsce --call "vsce package --no-dependencies -o dist/antigravity-quota-panel-0.1.2.vsix"
 ~~~
 
 ## 🔄 Sobre atualizações

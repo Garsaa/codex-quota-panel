@@ -93,41 +93,29 @@ function timeUntilReset(dateStr) {
 
 function normalize(usageResult, creditsResult) {
   const groupsRaw = usageResult?.command?.data?.groups || [];
-  const groups = groupsRaw.map((group) => {
-    const buckets = group.buckets || [];
-    const fiveBucket = buckets.find((b) => b.window === '5h' || b.id?.includes('5h'))
-      || buckets[1] || buckets[0];
-    const weekBucket = buckets.find((b) => b.window === 'weekly' || b.id?.includes('weekly'))
-      || buckets[0];
+  const geminiGroup = groupsRaw.find((g) => /gemini/i.test(g.name)) || groupsRaw[0];
+  const buckets = geminiGroup?.buckets || [];
+  const fiveBucket = buckets.find((b) => b.window === '5h' || b.id?.includes('5h'))
+    || buckets[1] || buckets[0];
+  const weekBucket = buckets.find((b) => b.window === 'weekly' || b.id?.includes('weekly'))
+    || buckets[0];
 
-    const toWindow = (b) => {
-      if (!b) return null;
-      const frac = Number(b.remaining_fraction);
-      const remaining = Number.isFinite(frac) ? Math.max(0, Math.min(100, Math.round(frac * 100))) : null;
-      const resetTime = b.reset_time;
-      return {
-        remaining,
-        resetDate: resetTime,
-        reset: resetTime ? `Reinicia ${timeUntilReset(resetTime)} · ${formatReset(resetTime)}` : 'Horário indisponível',
-      };
-    };
-
-    let label = group.name;
-    if (/gemini/i.test(group.name)) label = 'Gemini';
-    else if (/claude/i.test(group.name)) label = 'Claude & GPT';
-
+  const toWindow = (b) => {
+    if (!b) return null;
+    const frac = Number(b.remaining_fraction);
+    const remaining = Number.isFinite(frac) ? Math.max(0, Math.min(100, Math.round(frac * 100))) : null;
+    const resetTime = b.reset_time;
     return {
-      name: group.name,
-      label,
-      description: group.description,
-      five: toWindow(fiveBucket),
-      week: toWindow(weekBucket),
+      remaining,
+      resetDate: resetTime,
+      reset: resetTime ? `Reinicia ${timeUntilReset(resetTime)} · ${formatReset(resetTime)}` : 'Horário indisponível',
     };
-  });
+  };
 
   const creditsData = creditsResult?.command?.data;
   return {
-    groups,
+    five: toWindow(fiveBucket),
+    week: toWindow(weekBucket),
     credits: creditsData?.remaining_credits ?? null,
     upgradeUrl: creditsData?.upgrade_uri || DEFAULT_UPGRADE_URL,
     updatedAt: new Date(),
@@ -163,7 +151,8 @@ class AntigravityQuotaProvider {
     const data = this.snapshot;
     void view.webview.postMessage({
       type: 'snapshot',
-      groups: data?.groups ?? [],
+      five: data?.five ?? null,
+      week: data?.week ?? null,
       credits: data?.credits ?? null,
       updated: data?.updatedAt?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) ?? null,
       error: this.error,
@@ -172,21 +161,20 @@ class AntigravityQuotaProvider {
 }
 
 function updateStatusBar(statusBar, snapshot, error) {
-  if (!snapshot || !snapshot.groups || snapshot.groups.length === 0) {
+  if (!snapshot || (!snapshot.five && !snapshot.week)) {
     statusBar.text = '$(dashboard) AGY: limites indisponíveis';
     statusBar.tooltip = error || 'Consultando os limites do Antigravity…';
     return;
   }
 
-  const primary = snapshot.groups.find((g) => /gemini/i.test(g.name)) || snapshot.groups[0];
-  const five = primary.five?.remaining;
-  const week = primary.week?.remaining;
+  const five = snapshot.five?.remaining;
+  const week = snapshot.week?.remaining;
   statusBar.text = `$(dashboard) AGY 5h ${five ?? '—'}% · 7d ${week ?? '—'}%`;
 
   const lines = [
-    `Antigravity (${primary.label || primary.name})`,
-    `5h: ${five ?? '—'}% restante; ${primary.five?.reset || 'indisponível'}`,
-    `Semana: ${week ?? '—'}% restante; ${primary.week?.reset || 'indisponível'}`,
+    'Antigravity Quota (Gemini)',
+    `5h: ${five ?? '—'}% restante; ${snapshot.five?.reset || 'indisponível'}`,
+    `Semana: ${week ?? '—'}% restante; ${snapshot.week?.reset || 'indisponível'}`,
   ];
   if (snapshot.credits !== null && snapshot.credits !== undefined) {
     lines.push(`Créditos de IA: ${snapshot.credits}`);
@@ -195,7 +183,7 @@ function updateStatusBar(statusBar, snapshot, error) {
   if (error) {
     lines.push(`Falha na última atualização: ${error}`);
   }
-  lines.push('Clique para atualizar.');
+  lines.push('Clique para abrir o painel.');
   statusBar.tooltip = lines.join('\n');
 }
 
@@ -207,19 +195,26 @@ function activate(context) {
   });
 
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
-  statusBar.command = 'antigravityQuota.refresh';
+  statusBar.command = 'antigravityQuota.openPanel';
   statusBar.show();
 
   context.subscriptions.push(
     statusBar,
     vscode.window.registerWebviewViewProvider('antigravityQuotaView', provider),
-    vscode.window.registerWebviewViewProvider('antigravityQuotaSidebarView', provider),
     vscode.window.registerWebviewViewProvider('antigravityQuotaExplorerView', provider),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('antigravityQuota.openPanel', () => {
-      vscode.commands.executeCommand('antigravityQuotaView.focus');
+    vscode.commands.registerCommand('antigravityQuota.openPanel', async () => {
+      try {
+        await vscode.commands.executeCommand('workbench.view.extension.antigravityQuotaContainer');
+      } catch {
+        try {
+          await vscode.commands.executeCommand('antigravityQuotaView.focus');
+        } catch {
+          await vscode.commands.executeCommand('antigravityQuotaExplorerView.focus');
+        }
+      }
     }),
   );
 
